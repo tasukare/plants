@@ -1,0 +1,7 @@
+while wait() do
+  local Event = game:GetService("ReplicatedStorage").RemoteEvent.ServerRemoteEvent
+  Event:FireServer(
+    "Business",
+    "RNG_\xE5\x8D\x95\xE4\xBD\x8D"
+  )
+end
