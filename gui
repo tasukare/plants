@@ -28,11 +28,11 @@ Corner.Name = "Corner"
 Corner.Parent = Toggle
 Section:NewButton("auto", "Niigga farm for you", function()
 
-loadstring(game:HttpGet("https://raw.githubusercontent.com/tasukare/plants/blob/main/auto%20roll"))()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/tasukare/plants/main/auto%20roll"))()
 
 end)
 Section:NewButton("manual", "ButtonInfo", function()
 
-       loadstring(game:HttpGet("https://raw.githubusercontent.com/tasukare/plants/blob/main/roll"))()
+       loadstring(game:HttpGet("https://raw.githubusercontent.com/tasukare/plants/main/roll"))()
 
-    end)
+end)
