@@ -1,0 +1,87 @@
+local Players = game:GetService("Players")
+local CoreGui = game:GetService("CoreGui")
+
+-- Load Kavo UI Library
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
+local Window = Library.CreateLib("ប្រូរុងក៏ចេះឈឺចាប់🫂🥀", "DarkTheme")
+
+-- Setup Tabs & Sections
+local Tab = Window:NewTab("hev")
+local Section = Tab:NewSection("klean bok lhong")
+
+-- Create ScreenGui for the Open/Close Button
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "KavoToggleGui"
+ScreenGui.ResetOnSpawn = false
+
+local success, _ = pcall(function()
+    ScreenGui.Parent = CoreGui
+end)
+if not success then
+    ScreenGui.Parent = Players.LocalPlayer:WaitForChild("PlayerGui")
+end
+
+-- Toggle Button
+local Toggle = Instance.new("TextButton")
+Toggle.Name = "ToggleBtn"
+Toggle.Parent = ScreenGui
+Toggle.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+Toggle.Position = UDim2.new(0, 10, 0.45, 0)
+Toggle.Size = UDim2.new(0, 100, 0, 38)
+Toggle.Font = Enum.Font.GothamBold
+Toggle.Text = "Touch Me 😩"
+Toggle.TextColor3 = Color3.fromRGB(248, 248, 248)
+Toggle.TextSize = 16
+Toggle.Active = true
+Toggle.Draggable = true
+
+local Corner = Instance.new("UICorner")
+Corner.CornerRadius = UDim.new(0, 8)
+Corner.Parent = Toggle
+
+local Stroke = Instance.new("UIStroke")
+Stroke.Color = Color3.fromRGB(60, 60, 60)
+Stroke.Thickness = 1.5
+Stroke.Parent = Toggle
+
+Toggle.MouseButton1Click:Connect(function()
+    Library:ToggleUI()
+end)
+
+-- Auto Loop State
+local isAutoRolling = false
+
+-- 1. Auto Roll (Toggle ON/OFF)
+Section:NewToggle("Auto Roll", "Starts/Stops auto rolling", function(state)
+    isAutoRolling = state
+    
+    if isAutoRolling then
+        task.spawn(function()
+            while isAutoRolling do
+                pcall(function()
+                    loadstring(game:HttpGet("https://raw.githubusercontent.com/tasukare/plants/main/roll"))()
+                end)
+                task.wait(0.1) -- Delay between rolls to prevent lag/crashing
+            end
+        end)
+    end
+end)
+
+-- 2. Manual Single Roll
+Section:NewButton("Manual Roll", "Rolls 1 time", function()
+    pcall(function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/tasukare/plants/main/roll"))()
+    end)
+end)
+
+-- 3. Manual 30x Roll
+Section:NewButton("Manual 30x Roll", "Rolls 30 times quickly", function()
+    task.spawn(function()
+        for i = 1, 30 do
+            pcall(function()
+                loadstring(game:HttpGet("https://raw.githubusercontent.com/tasukare/plants/main/roll"))()
+            end)
+            task.wait(0.05) -- Small delay so requests don't drop
+        end
+    end)
+end)
