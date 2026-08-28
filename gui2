@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local CoreGui = game:GetService("CoreGui")
+local UserInputService = game:GetService("UserInputService")
 
 -- Load Kavo UI Library
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
@@ -33,7 +34,6 @@ Toggle.Text = "Touch Me 😩"
 Toggle.TextColor3 = Color3.fromRGB(248, 248, 248)
 Toggle.TextSize = 16
 Toggle.Active = true
-Toggle.Draggable = true
 
 local Corner = Instance.new("UICorner")
 Corner.CornerRadius = UDim.new(0, 8)
@@ -44,44 +44,128 @@ Stroke.Color = Color3.fromRGB(60, 60, 60)
 Stroke.Thickness = 1.5
 Stroke.Parent = Toggle
 
+-- Smooth Dragging System (Works for Button & Kavo Main Frame)
+local function makeDraggable(frame)
+    local dragging = false
+    local dragInput, mousePos, framePos
+
+    frame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            mousePos = input.Position
+            framePos = frame.Position
+
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+
+    frame.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            local delta = input.Position - mousePos
+            frame.Position = UDim2.new(
+                framePos.X.Scale,
+                framePos.X.Offset + delta.X,
+                framePos.Y.Scale,
+                framePos.Y.Offset + delta.Y
+            )
+        end
+    end)
+end
+
+-- Make Open/Close button draggable
+makeDraggable(Toggle)
+
+-- Make Kavo UI Main Frame draggable
+task.spawn(function()
+    task.wait(0.5)
+    local targetGui = CoreGui:FindFirstChild("ScreenGui") or Players.LocalPlayer.PlayerGui:FindFirstChild("ScreenGui")
+    if targetGui then
+        local mainFrame = targetGui:FindFirstChild("Main")
+        if mainFrame then
+            makeDraggable(mainFrame)
+        end
+    end
+end)
+
 Toggle.MouseButton1Click:Connect(function()
     Library:ToggleUI()
 end)
 
--- Auto Loop State
+-- Loop States
 local isAutoRolling = false
+local isAutoBuying = false
+local isAutoMerging = false
 
--- 1. Auto Roll (Toggle ON/OFF)
+-- 1. Auto Roll Toggle
 Section:NewToggle("Auto Roll", "Starts/Stops auto rolling", function(state)
     isAutoRolling = state
-    
     if isAutoRolling then
         task.spawn(function()
             while isAutoRolling do
                 pcall(function()
                     loadstring(game:HttpGet("https://raw.githubusercontent.com/tasukare/plants/main/roll"))()
                 end)
-                task.wait(0.1) -- Delay between rolls to prevent lag/crashing
+                task.wait(0.1)
             end
         end)
     end
 end)
 
--- 2. Manual Single Roll
+-- 2. Auto Buy Toggle
+Section:NewToggle("Auto Buy", "Starts/Stops auto buying", function(state)
+    isAutoBuying = state
+    if isAutoBuying then
+        task.spawn(function()
+            while isAutoBuying do
+                pcall(function()
+                    loadstring(game:HttpGet("https://raw.githubusercontent.com/tasukare/plants/main/buy"))()
+                end)
+                task.wait(0.2)
+            end
+        end)
+    end
+end)
+
+-- 3. Auto Merge Toggle
+Section:NewToggle("Auto Merge", "Starts/Stops auto merging", function(state)
+    isAutoMerging = state
+    if isAutoMerging then
+        task.spawn(function()
+            while isAutoMerging do
+                pcall(function()
+                    loadstring(game:HttpGet("https://raw.githubusercontent.com/tasukare/plants/main/Merge"))()
+                end)
+                task.wait(0.3)
+            end
+        end)
+    end
+end)
+
+-- 4. Manual Roll
 Section:NewButton("Manual Roll", "Rolls 1 time", function()
     pcall(function()
         loadstring(game:HttpGet("https://raw.githubusercontent.com/tasukare/plants/main/roll"))()
     end)
 end)
 
--- 3. Manual 30x Roll
+-- 5. Manual 30x Roll
 Section:NewButton("Manual 30x Roll", "Rolls 30 times quickly", function()
     task.spawn(function()
-        for i = 1, 30 do
+        for _ = 1, 30 do
             pcall(function()
                 loadstring(game:HttpGet("https://raw.githubusercontent.com/tasukare/plants/main/roll"))()
             end)
-            task.wait(0.2) -- Small delay so requests don't drop
+            task.wait(0.05)
         end
     end)
 end)
