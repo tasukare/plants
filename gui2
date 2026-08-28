@@ -81,7 +81,7 @@ Section:NewButton("Manual 30x Roll", "Rolls 30 times quickly", function()
             pcall(function()
                 loadstring(game:HttpGet("https://raw.githubusercontent.com/tasukare/plants/main/roll"))()
             end)
-            task.wait(0.05) -- Small delay so requests don't drop
+            task.wait(0.2) -- Small delay so requests don't drop
         end
     end)
 end)
